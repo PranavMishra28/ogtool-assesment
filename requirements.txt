@@ -1,0 +1,4 @@
+requests>=2.25.1
+beautifulsoup4>=4.9.3
+markdown>=3.3.4
+PyPDF2>=2.0.0

@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run Content Ingestion Tool Example",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"example.py"
+			],
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
