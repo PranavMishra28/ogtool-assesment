@@ -171,11 +171,23 @@ The tool automatically detects and assigns the following content types:
 python tech_knowledge_extractor.py --source "https://interviewing.io/blog"
 ```
 
+The tool will extract all blog posts by:
+
+1. Finding all article links on the blog page
+2. Following each link to extract the full content
+3. Handling any redirects to ensure complete extraction
+
 ### interviewing.io Company Guides
 
 ```bash
 python tech_knowledge_extractor.py --source "https://interviewing.io/topics#companies"
 ```
+
+The tool will extract all company guides by:
+
+1. Finding all company guide links on the topics page
+2. Following each link to extract the full content of each guide
+3. Setting the content_type to "guide" for appropriate categorization
 
 ### interviewing.io Interview Guides
 
@@ -183,11 +195,42 @@ python tech_knowledge_extractor.py --source "https://interviewing.io/topics#comp
 python tech_knowledge_extractor.py --source "https://interviewing.io/learn#interview-guides"
 ```
 
+The tool will extract all interview guides by:
+
+1. Finding all interview guide links on the learn page
+2. Following each link to extract the full content of each guide
+3. Setting the content_type to "guide" for appropriate categorization
+
 ### nilmamano.com DS&A Blog Posts
 
 ```bash
 python tech_knowledge_extractor.py --source "https://nilmamano.com/blog/category/dsa"
 ```
+
+The tool will extract all DS&A blog posts by:
+
+1. Finding all article links on the category page
+2. Following each link to extract the full content
+3. Processing any pagination to ensure all posts are captured
+
+### PDF Book from Google Drive
+
+```bash
+python tech_knowledge_extractor.py --gdrive "https://drive.google.com/file/d/YOUR_FILE_ID/view"
+```
+
+For a Google Drive folder with multiple PDFs:
+
+```bash
+python tech_knowledge_extractor.py --all --gdrive "https://drive.google.com/drive/folders/1AdUu4jh6DGwmCxfgnDQEMWWyo6_whPHJ"
+```
+
+The tool will:
+
+1. Extract the file ID from the Google Drive URL
+2. Download the PDF file(s) to a temporary location
+3. Process the PDF content, identifying and extracting chapters
+4. For books, process only the first 8 chapters as specified
 
 ### Substack Newsletter
 
@@ -195,11 +238,23 @@ python tech_knowledge_extractor.py --source "https://nilmamano.com/blog/category
 python tech_knowledge_extractor.py --source "https://shreycation.substack.com"
 ```
 
+The tool will:
+
+1. Access the Substack archive page to find all posts
+2. Extract and process each individual post
+3. Filter content by the main author if specified
+
 ### Generic Blog (Testing Robustness)
 
 ```bash
 python tech_knowledge_extractor.py --source "https://quill.co/blog"
 ```
+
+The tool demonstrates robustness by:
+
+1. Automatically detecting the blog structure
+2. Extracting links to individual articles
+3. Processing each article while handling different HTML structures
 
 ## Troubleshooting
 
@@ -239,3 +294,34 @@ Example extractor script (runs extraction for selected sources):
 ```bash
 python example_extractor.py
 ```
+
+## Handling Complex Link Structures
+
+The extractor is designed to handle complex link structures that may be encountered:
+
+### Link Redirects
+
+The tool follows HTTP redirects to ensure it reaches the final content page, even when the initial URL points to an intermediate page.
+
+### Nested Content
+
+For pages that require multiple clicks to reach the actual content (like clicking on a blog card to reach the full article), the tool:
+
+1. First identifies all links on the list/category page
+2. Then processes each link individually to extract the full content
+
+### Pagination
+
+For blogs with multiple pages, the tool can detect and follow pagination links to ensure all content is captured.
+
+### Non-Standard Layouts
+
+The tool uses multiple selectors and fallback strategies to handle various page layouts:
+
+- Common article selectors: `.post`, `article`, `.entry`, etc.
+- Site-specific selectors for known sites
+- Generic fallback for unknown structures
+
+## Important Notes on URL Processing
+
+When using the tool, always provide the exact URL as shown in the examples above. Using abbreviated source names like `interviewing_blog` instead of the full URL will cause errors.

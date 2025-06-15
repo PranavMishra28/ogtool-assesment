@@ -29,7 +29,7 @@ class ContentIngestionTool:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
         self.items = []
-
+        
     def detect_source_type(self, source: str) -> str:
         """
         Detect the type of source based on the input.
@@ -46,7 +46,7 @@ class ContentIngestionTool:
             return 'url'
         else:
             return 'unknown'
-
+            
     def clean_html_content(self, html_content: str) -> str:
         """
         Clean HTML content by removing ads, navigation, footers, etc.
@@ -69,14 +69,13 @@ class ContentIngestionTool:
         ]:
             for element in soup.select(selector):
                 element.decompose()
-        
-        # Find the main content (heuristic approach)
+          # Find the main content (heuristic approach)
         main_content = soup.find('main') or soup.find('article') or soup.find('div', class_=re.compile(r'content|article|post|entry'))
         
         if main_content:
             return str(main_content)
         return str(soup.body) if soup.body else str(soup)
-
+    
     def html_to_markdown(self, html_content: str) -> str:
         """
         Convert HTML content to Markdown.
@@ -87,104 +86,147 @@ class ContentIngestionTool:
         Returns:
             Markdown formatted content.
         """
-        soup = BeautifulSoup(html_content, 'html.parser')
-        
-        # Remove script and style elements
-        for script in soup(["script", "style"]):
-            script.decompose()
-        
-        # Process headings
-        for i in range(6, 0, -1):
-            for heading in soup.find_all(f'h{i}'):
-                heading.string = f"{'#' * i} {heading.get_text().strip()}\n\n"
-                heading.unwrap()
-        
-        # Process links
-        for a in soup.find_all('a'):
-            href = a.get('href', '')
-            text = a.get_text().strip()
-            a.replace_with(f"[{text}]({href})")
-        
-        # Process images
-        for img in soup.find_all('img'):
-            src = img.get('src', '')
-            alt = img.get('alt', '')
-            img.replace_with(f"![{alt}]({src})")
-        
-        # Process lists
-        for ul in soup.find_all('ul'):
-            for li in ul.find_all('li'):
-                li_text = li.get_text().strip()
-                li.string = f"* {li_text}\n"
-                li.unwrap()
-            ul.unwrap()
-        
-        for ol in soup.find_all('ol'):
-            for i, li in enumerate(ol.find_all('li'), 1):
-                li_text = li.get_text().strip()
-                li.string = f"{i}. {li_text}\n"
-                li.unwrap()
-            ol.unwrap()
-        
-        # Process code blocks
-        for pre in soup.find_all('pre'):
-            code_text = pre.get_text()
-            language = ""
-            if pre.find('code', class_=True):
-                class_name = pre.find('code').get('class', [""])[0]
-                if "language-" in class_name:
-                    language = class_name.replace("language-", "")
-            pre.replace_with(f"```{language}\n{code_text}\n```\n\n")
-        
-        # Process inline code
-        for code in soup.find_all('code'):
-            if code.parent.name != 'pre':
-                code_text = code.get_text()
-                code.replace_with(f"`{code_text}`")
-        
-        # Process blockquotes
-        for blockquote in soup.find_all('blockquote'):
-            lines = blockquote.get_text().strip().split('\n')
-            quoted_lines = [f"> {line}" for line in lines]
-            blockquote.replace_with('\n'.join(quoted_lines) + '\n\n')
-        
-        # Process tables
-        for table in soup.find_all('table'):
-            markdown_table = []
+        try:
+            soup = BeautifulSoup(html_content, 'html.parser')
             
-            # Process table headers
-            headers = []
-            if table.find('thead'):
-                for th in table.find('thead').find_all('th'):
-                    headers.append(th.get_text().strip())
-            elif table.find('tr'):
-                for th in table.find('tr').find_all(['th', 'td']):
-                    headers.append(th.get_text().strip())
+            # Remove script and style elements
+            for script in soup(["script", "style"]):
+                script.decompose()
             
-            if headers:
-                markdown_table.append('| ' + ' | '.join(headers) + ' |')
-                markdown_table.append('| ' + ' | '.join(['---' for _ in headers]) + ' |')
+            # Process headings - with error handling
+            for i in range(6, 0, -1):
+                for heading in soup.find_all(f'h{i}'):
+                    try:
+                        heading_text = heading.get_text().strip()
+                        heading.string = f"{'#' * i} {heading_text}\n\n"
+                        heading.unwrap()
+                    except Exception as e:
+                        # If unwrapping fails, replace the element with text
+                        heading_text = heading.get_text().strip()
+                        heading.replace_with(f"{'#' * i} {heading_text}\n\n")
             
-            # Process table rows
-            rows = table.find_all('tr')
-            start_idx = 1 if headers and not table.find('thead') else 0
+            # Process links with error handling
+            for a in soup.find_all('a'):
+                try:
+                    href = a.get('href', '')
+                    text = a.get_text().strip()
+                    a.replace_with(f"[{text}]({href})")
+                except Exception as e:
+                    # Skip problematic links
+                    pass
             
-            for row in rows[start_idx:]:
-                cells = []
-                for cell in row.find_all(['td', 'th']):
-                    cells.append(cell.get_text().strip())
-                if cells:
-                    markdown_table.append('| ' + ' | '.join(cells) + ' |')
+            # Process images
+            for img in soup.find_all('img'):
+                try:
+                    src = img.get('src', '')
+                    alt = img.get('alt', '')
+                    img.replace_with(f"![{alt}]({src})")
+                except Exception as e:
+                    pass
             
-            table.replace_with('\n'.join(markdown_table) + '\n\n')
-        
-        # Clean up the text
-        text = soup.get_text()
-        
-        # Remove excessive newlines
-        text = re.sub(r'\n{3,}', '\n\n', text)
-        
-        return text.strip()
+            # Process lists
+            for ul in soup.find_all('ul'):
+                try:
+                    for li in ul.find_all('li'):
+                        li_text = li.get_text().strip()
+                        li.string = f"* {li_text}\n"
+                        li.unwrap()
+                    ul.unwrap()
+                except Exception as e:
+                    pass
+            
+            for ol in soup.find_all('ol'):
+                try:
+                    for i, li in enumerate(ol.find_all('li'), 1):
+                        li_text = li.get_text().strip()
+                        li.string = f"{i}. {li_text}\n"
+                        li.unwrap()
+                    ol.unwrap()
+                except Exception as e:
+                    pass
+            
+            # Process code blocks
+            for pre in soup.find_all('pre'):
+                try:
+                    code_text = pre.get_text()
+                    language = ""
+                    if pre.find('code', class_=True):
+                        class_name = pre.find('code').get('class', [""])[0]
+                        if "language-" in class_name:
+                            language = class_name.replace("language-", "")
+                    pre.replace_with(f"```{language}\n{code_text}\n```\n\n")
+                except Exception as e:
+                    pass
+            
+            # Process inline code
+            for code in soup.find_all('code'):
+                try:
+                    if code.parent.name != 'pre':
+                        code_text = code.get_text()
+                        code.replace_with(f"`{code_text}`")
+                except Exception as e:
+                    pass
+            
+            # Process blockquotes
+            for blockquote in soup.find_all('blockquote'):
+                try:
+                    lines = blockquote.get_text().strip().split('\n')
+                    quoted_lines = [f"> {line}" for line in lines]
+                    blockquote.replace_with('\n'.join(quoted_lines) + '\n\n')
+                except Exception as e:
+                    pass
+            
+            # Process tables
+            for table in soup.find_all('table'):
+                try:
+                    markdown_table = []
+                    
+                    # Process table headers
+                    headers = []
+                    if table.find('thead'):
+                        for th in table.find('thead').find_all('th'):
+                            headers.append(th.get_text().strip())
+                    elif table.find('tr'):
+                        for th in table.find('tr').find_all(['th', 'td']):
+                            headers.append(th.get_text().strip())
+                    
+                    if headers:
+                        markdown_table.append('| ' + ' | '.join(headers) + ' |')
+                        markdown_table.append('| ' + ' | '.join(['---' for _ in headers]) + ' |')
+                    
+                    # Process table rows
+                    rows = table.find_all('tr')
+                    start_idx = 1 if headers and not table.find('thead') else 0
+                    
+                    for row in rows[start_idx:]:
+                        cells = []
+                        for cell in row.find_all(['td', 'th']):
+                            cells.append(cell.get_text().strip())
+                        if cells:
+                            markdown_table.append('| ' + ' | '.join(cells) + ' |')
+                    
+                    table.replace_with('\n'.join(markdown_table) + '\n\n')
+                except Exception as e:
+                    pass
+            
+            # Clean up the text
+            text = soup.get_text()
+            
+            # Remove excessive newlines
+            text = re.sub(r'\n{3,}', '\n\n', text)
+            
+            return text.strip()
+        except Exception as e:
+            # Fallback for any errors
+            if html_content:
+                # Try to extract plain text as a fallback
+                try:
+                    soup = BeautifulSoup(html_content, 'html.parser')
+                    text = soup.get_text(separator='\n\n')
+                    return text.strip()
+                except:
+                    return html_content
+            return ""
 
     def extract_title_from_html(self, html_content: str) -> str:
         """
@@ -247,7 +289,7 @@ class ContentIngestionTool:
             return author_element.get_text().strip()
         
         return ""
-
+        
     def determine_content_type(self, url: str, html_content: str = None) -> str:
         """
         Determine the content type based on URL and content.
@@ -286,7 +328,7 @@ class ContentIngestionTool:
                 return 'call_transcript'
         
         return 'other'
-
+        
     def process_web_page(self, url: str) -> List[Dict]:
         """
         Process a single web page.
@@ -302,8 +344,26 @@ class ContentIngestionTool:
             response.raise_for_status()
             html_content = response.text
             
-            cleaned_html = self.clean_html_content(html_content)
-            markdown_content = self.html_to_markdown(cleaned_html)
+            try:
+                cleaned_html = self.clean_html_content(html_content)
+                markdown_content = self.html_to_markdown(cleaned_html)
+            except Exception as parse_error:
+                # Fallback method for pages with problematic HTML
+                print(f"Error parsing HTML structure for {url}: {parse_error}")
+                print("Using fallback extraction method...")
+                
+                # Create a new BeautifulSoup object with a more lenient parser
+                soup = BeautifulSoup(html_content, 'html.parser')
+                
+                # Extract main text content directly
+                text_content = soup.get_text(separator='\n\n')
+                
+                # Basic markdown formatting
+                markdown_content = text_content.strip()
+                
+                # Remove excessive whitespace
+                markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+            
             title = self.extract_title_from_html(html_content)
             author = self.extract_author_from_html(html_content)
             content_type = self.determine_content_type(url, html_content)
