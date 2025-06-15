@@ -216,21 +216,54 @@ The tool will extract all DS&A blog posts by:
 ### PDF Book from Google Drive
 
 ```bash
-python tech_knowledge_extractor.py --gdrive "https://drive.google.com/file/d/YOUR_FILE_ID/view"
+python tech_knowledge_extractor.py --gdrive "https://drive.google.com/file/d/YOUR_FILE_ID/view" --output "book_content.json"
 ```
 
 For a Google Drive folder with multiple PDFs:
 
 ```bash
-python tech_knowledge_extractor.py --all --gdrive "https://drive.google.com/drive/folders/1AdUu4jh6DGwmCxfgnDQEMWWyo6_whPHJ"
+python tech_knowledge_extractor.py --gdrive "https://drive.google.com/drive/folders/YOUR_FOLDER_ID" --output "books_content.json"
 ```
 
-The tool will:
+#### Important: Google Drive Permissions
+
+For the tool to successfully download files from Google Drive:
+
+1. Make sure the PDF file is shared with the correct permissions:
+   - Open the file in Google Drive
+   - Click "Share" button in the top-right corner
+   - Click "Change to anyone with the link"
+   - Make sure "Viewer" permission is selected
+   - Click "Copy link"
+   - Click "Done"
+   - Use the copied link with the `--gdrive` parameter
+
+2. If you encounter "Cannot retrieve the public link of the file" error:
+   - The file might have restricted access
+   - Try downloading the file manually from Google Drive
+   - Save it to your computer
+   - Use the `--source` parameter with the local file path instead:
+     ```bash
+     python tech_knowledge_extractor.py --source "/path/to/your/file.pdf" --output "book_content.json"
+     ```
+
+3. For large files or files with frequent access:
+   - Google Drive may temporarily restrict automated downloads
+   - Consider using a direct download link or local file
+   - Set sharing to "Anyone with the link" can view
+   - Copy the link
+
+2. The tool now uses the `gdown` library for more reliable downloads from Google Drive.
+   If it's not installed, the tool will attempt to automatically install it.
+
+#### What the Tool Does
 
 1. Extract the file ID from the Google Drive URL
-2. Download the PDF file(s) to a temporary location
+2. Download the PDF file(s) using the gdown library
 3. Process the PDF content, identifying and extracting chapters
 4. For books, process only the first 8 chapters as specified
+
+You can specify the output file path using the `--output` parameter. If not specified, the default output file will be `aline_knowledge.json`.
 
 ### Substack Newsletter
 

@@ -4,12 +4,19 @@ import os
 import re
 from typing import Dict, List, Optional, Union
 import uuid
+import sys
 
 import requests
 from bs4 import BeautifulSoup
 import markdown
 import PyPDF2
 from urllib.parse import urlparse, urljoin
+try:
+    import gdown
+except ImportError:
+    print("gdown package not found. Installing gdown...")
+    os.system(f"{sys.executable} -m pip install gdown")
+    import gdown
 
 
 class ContentIngestionTool:
@@ -632,11 +639,9 @@ class ContentIngestionTool:
                 # Check if it's a list page or individual article
                 response = requests.get(source, headers=self.headers)
                 soup = BeautifulSoup(response.text, 'html.parser')
-                
-                # Heuristic to determine if it's a list page
+                  # Heuristic to determine if it's a list page
                 article_count = len(soup.find_all(['article', '.post', '.entry']))
                 link_count = len(soup.find_all('a', href=re.compile(r'/(article|post|blog)/')))
-                
                 if article_count > 3 or link_count > 10:
                     # Process as a list page
                     article_links = self.extract_links_from_list_page(source)
@@ -649,7 +654,7 @@ class ContentIngestionTool:
                     self.items.extend(items)
         else:
             print(f"Unknown source type: {source}")
-
+            
     def generate_output(self) -> Dict:
         """
         Generate the final output in the required JSON format.
@@ -661,10 +666,10 @@ class ContentIngestionTool:
             "team_id": self.team_id,
             "items": self.items
         }
-
+        
     def download_from_google_drive(self, file_id: str, destination: str) -> str:
         """
-        Download a file from Google Drive.
+        Download a file from Google Drive using gdown library.
         
         Args:
             file_id: The ID of the file in Google Drive.
@@ -673,30 +678,66 @@ class ContentIngestionTool:
         Returns:
             The local path where the file was saved.
         """
-        URL = "https://docs.google.com/uc?export=download"
+        # Ensure gdown is installed
+        try:
+            import gdown
+        except ImportError:
+            print("gdown package not found. Installing gdown...")
+            import subprocess
+            subprocess.check_call(['pip', 'install', 'gdown'])
+            import gdown
         
-        session = requests.Session()
+        try:
+            print(f"Downloading file from Google Drive with ID: {file_id}")
+            
+            # Construct the Google Drive URL
+            url = f"https://drive.google.com/uc?id={file_id}"
+            
+            # Use gdown to download the file - this handles large files and authentication
+            output = gdown.download(url, destination, quiet=False)
+            
+            # Check if download was successful
+            if output is None or not os.path.exists(destination) or os.path.getsize(destination) == 0:
+                print("Download failed. Trying alternative method...")
+                
+                # Try with the full sharing URL
+                sharing_url = f"https://drive.google.com/file/d/{file_id}/view"
+                output = gdown.download(sharing_url, destination, fuzzy=True, quiet=False)
+                
+                # If still failed, print detailed instructions
+                if output is None or not os.path.exists(destination) or os.path.getsize(destination) == 0:
+                    print("\n===== GOOGLE DRIVE DOWNLOAD FAILED =====")
+                    print("The file could not be downloaded due to Google Drive restrictions.")
+                    print("\nTo fix this issue:")
+                    print("1. Open the Google Drive link in your browser")
+                    print(f"   https://drive.google.com/file/d/{file_id}/view")
+                    print("2. Click the 'Share' button in the top-right corner")
+                    print("3. Click 'Change to anyone with the link'")
+                    print("4. Make sure 'Viewer' permission is selected")
+                    print("5. Click 'Copy link'")
+                    print("6. Click 'Done'")
+                    print("7. Try running this tool again with the copied link")
+                    print("\nAlternatively:")
+                    print("1. Download the PDF manually from Google Drive")
+                    print("2. Save it to your computer")
+                    print("3. Use the --source parameter with the local file path instead")
+                    print("   python tech_knowledge_extractor.py --source /path/to/your/file.pdf\n")
+            
+            # Validate file size
+            if os.path.exists(destination) and os.path.getsize(destination) < 1000:  # Less than 1KB is suspicious
+                print(f"Warning: Downloaded file is suspiciously small ({os.path.getsize(destination)} bytes).")
+                print("This usually means the download failed or requires authentication.")
+                print("Make sure the file is shared with 'Anyone with the link' on Google Drive.")
+            
+            return destination
         
-        response = session.get(URL, params={'id': file_id}, stream=True)
-        token = None
-        
-        # Get the download token if needed for large files
-        for key, value in response.cookies.items():
-            if key.startswith('download_warning'):
-                token = value
-                break
-        
-        if token:
-            params = {'id': file_id, 'confirm': token}
-            response = session.get(URL, params=params, stream=True)
-        
-        # Save the file
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(32768):
-                if chunk:
-                    f.write(chunk)
-        
-        return destination
+        except Exception as e:
+            print(f"Error downloading file from Google Drive: {e}")
+            if not os.path.exists(destination):
+                # Create an empty file to prevent further errors
+                with open(destination, 'w') as f:
+                    pass
+            return destination
 
 
 def main():

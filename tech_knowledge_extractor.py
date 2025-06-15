@@ -273,10 +273,8 @@ class TechKnowledgeExtractor:
             # 2. List all files in the folder
             # 3. Filter for PDF files
             # 4. Process each PDF file
-            
-            # For now, we'll assume the folder ID is treated as a file ID for the first PDF
+              # For now, we'll assume the folder ID is treated as a file ID for the first PDF
             self._process_single_gdrive_pdf(folder_id)
-            
         else:
             # Extract the file ID from the Google Drive link
             file_id_match = re.search(r'[-\w]{25,}', gdrive_link)
@@ -304,9 +302,20 @@ class TechKnowledgeExtractor:
                 logging.info(f"Downloading PDF from Google Drive (ID: {file_id})...")
                 self.content_tool.download_from_google_drive(file_id, pdf_path)
                 
+                # Check if file was downloaded successfully
+                if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
+                    logging.error("PDF download failed. The file is empty or not accessible.")
+                    logging.error("Please check the Google Drive link and ensure the file is shared with 'Anyone with the link'.")
+                    return
+                
                 # Process the PDF
                 logging.info("Processing PDF content...")
                 items = self.content_tool.process_pdf(pdf_path)
+                
+                # If no items were extracted, log a warning
+                if not items:
+                    logging.warning("No content was extracted from the PDF. The file may be empty, password-protected, or in an unsupported format.")
+                    return
                 
                 # If it's specified to process only the first 8 chapters
                 # We'll check the titles and only include those that match
@@ -328,8 +337,6 @@ class TechKnowledgeExtractor:
                 self.items.extend(first_8_chapters)
         except Exception as e:
             logging.error(f"Error processing PDF from Google Drive (ID: {file_id}): {e}")
-        except Exception as e:
-            logging.error(f"Error processing PDF from Google Drive: {e}")
     
     def process_substack(self, url: str):
         """
@@ -582,7 +589,12 @@ def main():
     
     extractor = TechKnowledgeExtractor(args.team_id, args.user_id)
     
-    if args.all:
+    if args.gdrive:
+        # Process Google Drive PDF
+        logging.info(f"Processing Google Drive PDF from link: {args.gdrive}")
+        extractor.process_book_chapters_from_gdrive(args.gdrive)
+        extractor.save_output(args.output)
+    elif args.all:
         # Process all sources
         extractor.process_all_sources(args.gdrive, args.output)
     elif args.source:
@@ -624,7 +636,7 @@ def main():
         
         extractor.save_output(args.output)
     else:
-        logging.error("Please specify a source with --source or use --all to process all sources.")
+        logging.error("Please specify a source with --source, --gdrive, or use --all to process all sources.")
         parser.print_help()
 
 
