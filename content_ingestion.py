@@ -341,15 +341,37 @@ class ContentIngestionTool:
             base_url = f"{urlparse(url).scheme}://{urlparse(url).netloc}"
             
             links = []
-            # Try various selectors to find article links
-            article_links = (
-                soup.select('a[href*="article"]') or
-                soup.select('a[href*="post"]') or
-                soup.select('a[href*="blog"]') or
-                soup.select('.article-title a') or
-                soup.select('.post-title a') or
-                soup.select('article a')
-            )
+            
+            # Handle interviewing.io specifically
+            if 'interviewing.io' in url:
+                # For blog posts
+                if '/blog' in url:
+                    article_links = soup.select('.post-title a, .post a, article a, .blog-post a')
+                # For company guides
+                elif '/topics#companies' in url:
+                    article_links = soup.select('.company-card a, .topics-card a')
+                # For interview guides
+                elif '/learn' in url:
+                    article_links = soup.select('.guide-card a, .card a')
+                else:
+                    article_links = soup.select('a[href*="article"], a[href*="post"], a[href*="blog"], a[href*="guide"]')
+            # Handle nilmamano.com specifically
+            elif 'nilmamano.com' in url:
+                article_links = soup.select('article a, .post a, .entry a, .blog-entry a')
+            # Handle quill.co specifically
+            elif 'quill.co/blog' in url:
+                article_links = soup.select('.post-card a, .blog-post a, article a')
+            # Generic approach for other sites
+            else:
+                article_links = (
+                    soup.select('a[href*="article"]') or
+                    soup.select('a[href*="post"]') or
+                    soup.select('a[href*="blog"]') or
+                    soup.select('.article-title a') or
+                    soup.select('.post-title a') or
+                    soup.select('article a') or
+                    soup.select('.card a, .guide a')  # Common for guide/card based layouts
+                )
             
             seen_urls = set()
             for link in article_links:
@@ -579,6 +601,42 @@ class ContentIngestionTool:
             "team_id": self.team_id,
             "items": self.items
         }
+
+    def download_from_google_drive(self, file_id: str, destination: str) -> str:
+        """
+        Download a file from Google Drive.
+        
+        Args:
+            file_id: The ID of the file in Google Drive.
+            destination: The local path to save the file to.
+            
+        Returns:
+            The local path where the file was saved.
+        """
+        URL = "https://docs.google.com/uc?export=download"
+        
+        session = requests.Session()
+        
+        response = session.get(URL, params={'id': file_id}, stream=True)
+        token = None
+        
+        # Get the download token if needed for large files
+        for key, value in response.cookies.items():
+            if key.startswith('download_warning'):
+                token = value
+                break
+        
+        if token:
+            params = {'id': file_id, 'confirm': token}
+            response = session.get(URL, params=params, stream=True)
+        
+        # Save the file
+        with open(destination, 'wb') as f:
+            for chunk in response.iter_content(32768):
+                if chunk:
+                    f.write(chunk)
+        
+        return destination
 
 
 def main():
