@@ -23,8 +23,8 @@ else
     source venv/bin/activate
 fi
 
-# Run the content ingestion tool
-python content_ingestion.py "$@"
+# Run the technical content extractor
+python3 tech_content_extractor.py "$@"
 
 # Deactivate virtual environment
 deactivate

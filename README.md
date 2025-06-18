@@ -1,23 +1,23 @@
-# Aline Technical Knowledge Extractor
+# Technical Content Extractor
 
-A robust, production-ready tool for extracting technical content from various sources into a structured knowledge base for Reddit-style auto-comment generation.
+A robust, production-ready, and extensible tool for extracting technical content from various sources into a structured knowledge base. The system uses a plugin-based architecture that allows easy addition of new content sources without modifying the core code.
 
 ## Overview
 
-This tool extracts technical knowledge from:
+This tool extracts technical knowledge from many different sources through a configurable plugin system:
 
-1. interviewing.io blog posts
-2. interviewing.io company guides
-3. interviewing.io interview guides
-4. nilmamano.com DS&A blog posts
-5. Book chapters from PDF files (including Google Drive)
-6. Substack newsletters (bonus)
-7. Generic blogs (e.g., quill.co/blog for robustness testing)
+1. Generic blogs and technical articles
+2. Book chapters from PDF files (including Google Drive)
+3. Substack newsletters
+4. GitHub repositories (documentation, README files)
+5. Other sources via custom extractors
 
-All content is cleaned, converted to markdown, and structured into a consistent JSON format suitable for importing into a knowledge base.
+All content is cleaned, converted to markdown, and structured into a consistent JSON format suitable for importing into a knowledge base or further processing.
 
 ## Features
 
+- **Plugin-Based Architecture**: Easily extend the system with new content source extractors
+- **Configuration-Driven**: Configure extractors and behavior through a simple JSON config file
 - **Multi-Source Support**: Scrapes and processes content from diverse sources
 - **Smart Content Cleaning**: Removes ads, navigation bars, footers, and other non-content elements
 - **Markdown Conversion**: Converts all content to clean, consistent markdown format
@@ -27,20 +27,21 @@ All content is cleaned, converted to markdown, and structured into a consistent 
 - **Progress Reporting**: Shows progress bars for multi-item extractions
 - **Error Handling**: Robust error handling with detailed logging
 - **Flexible Output**: Generates structured JSON in the required format
-- **Interactive Scripts**: Includes batch files for easy execution
+- **Interactive Scripts**: Includes example scripts for easy testing and demonstration
 
 ## Architecture
 
-The project consists of two main Python files:
+The project follows a modular, plugin-based architecture:
 
-1. **tech_knowledge_extractor.py**: The main orchestrator that handles specific sources and coordinates the extraction process
-2. **content_ingestion.py**: A general-purpose tool for content processing, used by the extractor
+1. **tech_content_extractor.py**: The main orchestrator that dynamically discovers and loads extractors
+2. **content_extraction/base.py**: Core abstractions and interfaces for the extraction system
+3. **content_extraction/extractors/**: Directory containing individual extractor plugins
+4. **config.json**: Configuration file for customizing extractor behavior
 
 Helper scripts:
 
-- **run_extractor.bat**: Windows interactive menu
-- **run_extractor.sh**: Linux/macOS interactive menu
-- **example_extractor.py**: Example implementation for testing
+- **example.py**: Example script demonstrating how to use the framework
+- **run_extractor.bat/sh**: Interactive menu scripts for easy usage
 
 ## Installation
 
@@ -72,32 +73,39 @@ Helper scripts:
 
 ### Interactive Mode
 
-Run the provided script for an interactive menu:
-
-**Windows:**
+Run the example script in interactive mode:
 
 ```bash
-run_extractor.bat
-```
-
-**macOS/Linux:**
-
-```bash
-bash run_extractor.sh
+python example.py --interactive
 ```
 
 ### Command Line Usage
 
-**Process all specified sources:**
-
-```bash
-python tech_knowledge_extractor.py --all
-```
-
 **Process a specific source:**
 
 ```bash
-python tech_knowledge_extractor.py --source "https://interviewing.io/blog"
+python tech_content_extractor.py "https://example.com/blog/article"
+```
+
+**Process a source with custom output location:**
+
+```bash
+python tech_content_extractor.py "https://github.com/username/repo" --output "github_content.json"
+```
+
+### Example Script
+
+Try the included examples:
+
+```bash
+# Run the blog example
+python example.py --blog
+
+# Run the GitHub example
+python example.py --github
+
+# Run the Substack example
+python example.py --substack
 ```
 
 **Process all sources plus a book from Google Drive:**
@@ -120,74 +128,130 @@ For more flexibility with any source:
 python content_ingestion.py --source <SOURCE_URL_OR_PATH> [--team_id TEAM_ID] [--user_id USER_ID] [--output OUTPUT_FILE]
 ```
 
+## Extending with Custom Extractors
+
+The plugin architecture makes it easy to add new content source extractors:
+
+1. Create a new file in `content_extraction/extractors/` (e.g., `my_source.py`)
+2. Implement a class that inherits from `ContentExtractor`
+3. Implement the required methods: `can_handle` and `extract`
+4. Update the configuration in `config.json` with source-specific settings
+
+Example structure for a custom extractor:
+
+```python
+from content_extraction.base import ContentExtractor, ContentItem
+
+class MyCustomExtractor(ContentExtractor):
+    """Extractor for my custom content source."""
+
+    def __init__(self, config):
+        super().__init__(config)
+        # Get custom configuration settings
+        self.my_setting = config.get("extractors", {}).get("my_source", {}).get("my_setting", "default")
+
+    def can_handle(self, source: str) -> bool:
+        # Determine if this extractor can handle the source
+        return "mysite.com" in source.lower()
+
+    def extract(self, source: str) -> List[ContentItem]:
+        # Extract content from the source
+        # Return a list of ContentItem objects
+        # ...
+```
+
 ## Output Format
 
 The tool produces JSON output in the following format:
 
 ```json
-{
-  "team_id": "aline123",
-  "items": [
-    {
-      "title": "<Extracted Title>",
-      "content": "<Cleaned markdown content>",
-      "content_type": "blog|podcast_transcript|call_transcript|linkedin_post|reddit_comment|book|other",
-      "source_url": "<Original URL or source path>",
-      "author": "<Author if known>",
-      "user_id": ""
-    },
-    ...
-  ]
-}
+[
+  {
+    "id": "<Unique identifier>",
+    "title": "<Extracted Title>",
+    "content": "<Cleaned markdown content>",
+    "source_url": "<Original URL or source path>",
+    "content_type": "article|documentation|guide|book_chapter|other",
+    "author": "<Author if known>",
+    "date_published": "<Publication date if available>",
+    "tags": ["<tag1>", "<tag2>"],
+    "metadata": {
+      "<key>": "<value>",
+      ...
+    }
+  },
+  ...
+]
 ```
 
 ## Content Types
 
-The tool automatically detects and assigns the following content types:
+The system automatically detects and assigns appropriate content types:
 
-- `blog`: Blog posts and articles
-- `guide`: Company or interview guides
-- `podcast_transcript`: Podcast episode transcripts
-- `call_transcript`: Interview or meeting transcripts
-- `linkedin_post`: LinkedIn posts
-- `reddit_comment`: Reddit comments or posts
-- `book`: Book chapters or PDF content
+- `article`: Blog posts, technical articles
+- `documentation`: Documentation pages, GitHub READMEs
+- `guide`: How-to guides, tutorials
+- `book_chapter`: Book chapters or PDF content sections
 - `other`: Content that doesn't match the above categories
+
+## Configuration Options
+
+The `config.json` file allows you to customize extractor behavior:
+
+```json
+{
+  "output_directory": "./output",
+  "log_level": "INFO",
+  "user_agent": "Mozilla/5.0...",
+  "sources": {
+    "blog": {
+      "enabled": true,
+      "delay_between_requests": [1, 3]
+    },
+    "pdf": {
+      "enabled": true,
+      "max_chapters": 0
+    },
+    "github": {
+      "enabled": true,
+      "max_files_per_repo": 50
+    }
+  },
+  "extractors": {
+    "generic_blog": {
+      "article_selectors": ["article", ".post", ".entry", ".blog-post"],
+      "list_page_link_patterns": ["/(article|post|blog)/", "/\\d{4}/\\d{2}/"]
+    },
+    "pdf": {
+      "chapter_patterns": [
+        "(?:Chapter|CHAPTER)\\s+(\\d+|[IVX]+)[:\\s]+(.+?)(?=(?:Chapter|CHAPTER)\\s+\\d+|$)"
+      ]
+    },
+    "github": {
+      "access_token": "",
+      "max_files": 50,
+      "file_extensions": [".md", ".markdown", ".txt", ".rst"]
+    }
+  }
+}
+```
 
 ## Command Line Options
 
-- `--source`: URL or file path to process
-- `--gdrive`: Google Drive link to a PDF book
-- `--all`: Process all specified sources
-- `--team_id`: Team ID for the knowledge base (default: 'aline123')
-- `--user_id`: User ID (optional)
-- `--output`: Output JSON file path (default: 'aline_knowledge.json')
+### tech_content_extractor.py
 
-## Source-Specific Examples
+- Source URL or file path (positional argument): The source to process
+- `--config`: Path to configuration file (default: 'config.json')
+- `--output`: Output JSON file path (default: 'extracted_content.json')
+- `--list-sources`: List supported source types
+- `--interactive`: Run in interactive mode
 
-### interviewing.io Blog Posts
+### example.py
 
-```bash
-python tech_knowledge_extractor.py --source "https://interviewing.io/blog"
-```
-
-The tool will extract all blog posts by:
-
-1. Finding all article links on the blog page
-2. Following each link to extract the full content
-3. Handling any redirects to ensure complete extraction
-
-### interviewing.io Company Guides
-
-```bash
-python tech_knowledge_extractor.py --source "https://interviewing.io/topics#companies"
-```
-
-The tool will extract all company guides by:
-
-1. Finding all company guide links on the topics page
-2. Following each link to extract the full content of each guide
-3. Setting the content_type to "guide" for appropriate categorization
+- `--interactive`: Run in interactive mode
+- `--blog`: Run the blog processing example
+- `--github`: Run the GitHub processing example
+- `--substack`: Run the Substack processing example
 
 ### interviewing.io Interview Guides
 

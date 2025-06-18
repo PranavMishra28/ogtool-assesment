@@ -24,8 +24,8 @@ if not exist venv (
     call venv\Scripts\activate
 )
 
-REM Run the content ingestion tool
-python content_ingestion.py %*
+REM Run the technical content extractor
+python tech_content_extractor.py %*
 
 REM Deactivate virtual environment
 call venv\Scripts\deactivate
