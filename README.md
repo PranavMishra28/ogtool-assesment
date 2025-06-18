@@ -230,6 +230,7 @@ python tech_knowledge_extractor.py --gdrive "https://drive.google.com/drive/fold
 For the tool to successfully download files from Google Drive:
 
 1. Make sure the PDF file is shared with the correct permissions:
+
    - Open the file in Google Drive
    - Click "Share" button in the top-right corner
    - Click "Change to anyone with the link"
@@ -239,6 +240,7 @@ For the tool to successfully download files from Google Drive:
    - Use the copied link with the `--gdrive` parameter
 
 2. If you encounter "Cannot retrieve the public link of the file" error:
+
    - The file might have restricted access
    - Try downloading the file manually from Google Drive
    - Save it to your computer
@@ -248,12 +250,13 @@ For the tool to successfully download files from Google Drive:
      ```
 
 3. For large files or files with frequent access:
+
    - Google Drive may temporarily restrict automated downloads
    - Consider using a direct download link or local file
    - Set sharing to "Anyone with the link" can view
    - Copy the link
 
-2. The tool now uses the `gdown` library for more reliable downloads from Google Drive.
+4. The tool now uses the `gdown` library for more reliable downloads from Google Drive.
    If it's not installed, the tool will attempt to automatically install it.
 
 #### What the Tool Does
