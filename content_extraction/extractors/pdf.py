@@ -7,14 +7,15 @@ This module provides functionality to extract content from PDF files.
 import os
 import re
 import logging
+import tempfile
 from typing import Dict, List, Any, Optional
 from pathlib import Path
+import uuid
 
 import PyPDF2
 import gdown
 
 from content_extraction.base import ContentExtractor, ContentItem
-from content_extraction.utils import generate_unique_id
 
 
 class PDFExtractor(ContentExtractor):
@@ -30,7 +31,7 @@ class PDFExtractor(ContentExtractor):
         super().__init__(config)
         self.chapter_patterns = config.get("extractors", {}).get("pdf", {}).get(
             "chapter_patterns", [
-                "(?:Chapter|CHAPTER)\\s+(\\d+|[IVX]+)[:\\s]+(.+?)(?=(?:Chapter|CHAPTER)\\s+\\d+|$)"
+                r"(?:Chapter|CHAPTER)\s+(\d+|[IVX]+)[:\s]+(.+?)(?=(?:Chapter|CHAPTER)\s+\d+|$)"
             ]
         )
         self.max_chapters = config.get("sources", {}).get("pdf", {}).get("max_chapters", 0)
@@ -94,48 +95,47 @@ class PDFExtractor(ContentExtractor):
         self.logger.info(f"Downloading PDF from Google Drive: {url}")
         
         try:
-            # Extract file ID from URL
-            file_id = None
+            # Create a temporary file
+            temp_dir = tempfile.gettempdir()
+            output_path = os.path.join(temp_dir, f"gdrive_pdf_{uuid.uuid4().hex[:8]}.pdf")
             
-            # Format: https://drive.google.com/file/d/FILE_ID/view
-            if '/file/d/' in url:
-                file_id = url.split('/file/d/')[1].split('/')[0]
-            # Format: https://drive.google.com/open?id=FILE_ID
-            elif 'open?id=' in url:
-                file_id = url.split('open?id=')[1].split('&')[0]
+            # Use gdown to download the file
+            gdown.download(url, output_path, quiet=False)
             
-            if not file_id:
-                self.logger.error(f"Could not extract file ID from Google Drive URL: {url}")
+            # Verify the file was downloaded and is a PDF
+            if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+                self.logger.error("Failed to download file from Google Drive")
                 return None
-            
-            # Create temporary file
-            temp_dir = Path(os.path.expanduser("~")) / ".temp_pdf_downloads"
-            temp_dir.mkdir(exist_ok=True)
-            
-            pdf_path = os.path.join(temp_dir, f"{file_id}.pdf")
-            
-            # Download using gdown
-            self.logger.info(f"Downloading file ID {file_id} to {pdf_path}")
-            try:
-                output = gdown.download(id=file_id, output=pdf_path, quiet=False)
-                if output is None:
-                    self.logger.error(f"Failed to download file. Make sure the file exists and is shared with 'Anyone with the link'")
-                    return None
-            except Exception as e:
-                self.logger.error(f"Error downloading file from Google Drive: {e}", exc_info=True)
+                
+            # Check if the file is actually a PDF
+            if not self._is_valid_pdf(output_path):
+                self.logger.error("Downloaded file is not a valid PDF")
+                os.remove(output_path)  # Clean up the invalid file
                 return None
-            
-            # Check if file was downloaded successfully
-            if not os.path.exists(pdf_path) or os.path.getsize(pdf_path) == 0:
-                self.logger.error("PDF download failed. The file is empty or not accessible.")
-                return None
-            
-            self.logger.info(f"Successfully downloaded PDF to {pdf_path}")
-            return pdf_path
+                
+            self.logger.info(f"Successfully downloaded PDF to {output_path}")
+            return output_path
             
         except Exception as e:
             self.logger.error(f"Error downloading from Google Drive: {e}", exc_info=True)
             return None
+    
+    def _is_valid_pdf(self, filepath: str) -> bool:
+        """
+        Check if a file is a valid PDF.
+        
+        Args:
+            filepath: Path to the file to check
+            
+        Returns:
+            True if the file is a valid PDF, False otherwise
+        """
+        try:
+            with open(filepath, 'rb') as f:
+                PyPDF2.PdfReader(f)
+            return True
+        except:
+            return False
     
     def _extract_from_pdf(self, pdf_path: str, source_url: Optional[str] = None) -> List[ContentItem]:
         """
@@ -143,96 +143,138 @@ class PDFExtractor(ContentExtractor):
         
         Args:
             pdf_path: Path to the PDF file
-            source_url: Original source URL (optional)
+            source_url: Original source URL if available
             
         Returns:
-            List of ContentItem objects, one per chapter/section
+            List of ContentItem objects
         """
         self.logger.info(f"Extracting content from PDF: {pdf_path}")
         
         try:
-            with open(pdf_path, 'rb') as pdf_file:
-                pdf_reader = PyPDF2.PdfReader(pdf_file)
+            with open(pdf_path, 'rb') as f:
+                pdf_reader = PyPDF2.PdfReader(f)
+                
+                # Get basic info
+                num_pages = len(pdf_reader.pages)
+                self.logger.info(f"PDF has {num_pages} pages")
                 
                 # Extract text from all pages
                 full_text = ""
-                for page_num in range(len(pdf_reader.pages)):
+                for page_num in range(num_pages):
                     page = pdf_reader.pages[page_num]
                     full_text += page.extract_text() + "\n\n"
                 
-                # Extract document info for metadata
-                title = os.path.basename(pdf_path)
-                if pdf_reader.metadata and pdf_reader.metadata.title:
-                    title = pdf_reader.metadata.title
+                # Try to extract a title from the PDF
+                title = self._extract_pdf_title(pdf_reader) or os.path.basename(pdf_path)
                 
-                author = None
-                if pdf_reader.metadata and pdf_reader.metadata.author:
-                    author = pdf_reader.metadata.author
-                
-                # Try to identify chapters
-                chapters = []
-                for pattern in self.compiled_patterns:
-                    matches = pattern.findall(full_text)
-                    if matches:
-                        for chapter_num, chapter_content in matches:
-                            chapter_title = f"Chapter {chapter_num}"
-                            
-                            # Try to extract title from the first few lines
-                            title_match = re.search(r'(.+?)(?:\n\n|\r\n\r\n)', chapter_content)
-                            if title_match:
-                                potential_title = title_match.group(1).strip()
-                                if len(potential_title) <= 100:  # Reasonable title length
-                                    chapter_title = f"Chapter {chapter_num}: {potential_title}"
-                            
-                            chapters.append({
-                                "number": chapter_num,
-                                "title": chapter_title,
-                                "content": chapter_content.strip()
-                            })
-                        
-                        # If we found chapters with this pattern, no need to try others
-                        break
+                # Try to identify chapters/sections
+                chapters = self._identify_chapters(full_text)
                 
                 items = []
                 
-                # If chapters were found, process each one
                 if chapters:
-                    # Limit chapters if configured
-                    if self.max_chapters > 0:
-                        chapters = chapters[:self.max_chapters]
+                    self.logger.info(f"Identified {len(chapters)} chapters/sections")
                     
-                    for chapter in chapters:
-                        content_item = ContentItem(
-                            content_id=generate_unique_id(),
-                            title=chapter["title"],
-                            content=chapter["content"],
+                    # Process each chapter as a separate ContentItem
+                    for idx, (chapter_title, chapter_content) in enumerate(chapters):
+                        # Generate a unique ID
+                        content_id = str(uuid.uuid5(uuid.NAMESPACE_URL, f"{source_url or pdf_path}#{idx}"))
+                        
+                        # Create content item
+                        item = ContentItem(
+                            content_id=content_id,
+                            title=f"{title} - {chapter_title}",
+                            content=chapter_content.strip(),
                             source_url=source_url,
                             content_type="book_chapter",
-                            author=author,
                             metadata={
-                                "chapter_number": chapter["number"],
-                                "pdf_filename": os.path.basename(pdf_path)
+                                "pdf_path": pdf_path if not source_url else None,
+                                "chapter_index": idx,
+                                "total_chapters": len(chapters),
+                                "parent_document": title
                             }
                         )
-                        items.append(content_item)
+                        items.append(item)
+                        
+                        # Respect max_chapters limit if set
+                        if self.max_chapters > 0 and len(items) >= self.max_chapters:
+                            break
                 else:
-                    # No chapters found, treat the whole document as a single item
-                    content_item = ContentItem(
-                        content_id=generate_unique_id(),
+                    # If no chapters identified, treat the whole document as one item
+                    self.logger.info("No chapters identified, treating the whole document as one item")
+                    
+                    content_id = str(uuid.uuid5(uuid.NAMESPACE_URL, source_url or pdf_path))
+                    
+                    item = ContentItem(
+                        content_id=content_id,
                         title=title,
                         content=full_text.strip(),
                         source_url=source_url,
-                        content_type="document",
-                        author=author,
+                        content_type="book_chapter",
                         metadata={
-                            "pdf_filename": os.path.basename(pdf_path)
+                            "pdf_path": pdf_path if not source_url else None,
+                            "page_count": num_pages
                         }
                     )
-                    items.append(content_item)
+                    items.append(item)
                 
-                self.logger.info(f"Extracted {len(items)} items from PDF")
                 return items
                 
         except Exception as e:
-            self.logger.error(f"Error extracting from PDF {pdf_path}: {e}", exc_info=True)
+            self.logger.error(f"Error processing PDF {pdf_path}: {e}", exc_info=True)
             return []
+    
+    def _extract_pdf_title(self, pdf_reader: PyPDF2.PdfReader) -> Optional[str]:
+        """Extract title from PDF metadata if available."""
+        try:
+            if pdf_reader.metadata and pdf_reader.metadata.title:
+                return pdf_reader.metadata.title
+                
+            # Try to extract from first page text
+            if len(pdf_reader.pages) > 0:
+                first_page_text = pdf_reader.pages[0].extract_text()
+                lines = first_page_text.split('\n')
+                # Heuristic: first non-empty line might be the title
+                for line in lines:
+                    if line.strip() and len(line.strip()) < 100:  # Reasonable title length
+                        return line.strip()
+        except:
+            pass
+            
+        return None
+    
+    def _identify_chapters(self, text: str) -> List[tuple]:
+        """
+        Identify chapters or sections in the text.
+        
+        Args:
+            text: Full text of the PDF
+            
+        Returns:
+            List of (chapter_title, chapter_content) tuples
+        """
+        chapters = []
+        
+        for pattern in self.compiled_patterns:
+            matches = list(pattern.finditer(text))
+            
+            if matches:
+                # Extract chapters based on the matches
+                for i, match in enumerate(matches):
+                    chapter_num = match.group(1)
+                    chapter_title = match.group(2).strip()
+                    
+                    # Chapter content goes from current match to next match or end
+                    start_pos = match.start()
+                    end_pos = matches[i+1].start() if i < len(matches)-1 else len(text)
+                    
+                    # Skip the chapter heading itself
+                    content_start = match.end()
+                    
+                    chapter_content = text[content_start:end_pos].strip()
+                    chapters.append((f"Chapter {chapter_num}: {chapter_title}", chapter_content))
+                
+                # If we found chapters with this pattern, no need to try others
+                break
+        
+        return chapters

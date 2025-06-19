@@ -191,38 +191,37 @@ def extract_main_content(html: str, content_selectors: Optional[List[str]] = Non
     
     soup = BeautifulSoup(html, 'html.parser')
     
-    # Default content selectors (in order of preference)
-    default_selectors = [
-        'article', 
-        '.post-content', '.entry-content', '.article-content', 
-        '.content', '.main-content', '.post', '.entry', 
-        'main', '#content', '#main', '#main-content'
-    ]
+    # Remove unwanted elements
+    for selector in ['script', 'style', 'nav', 'header', 'footer', '.ads', '.sidebar', '.comments', '.navbar']:
+        for element in soup.select(selector):
+            element.decompose()
     
-    # Combine default and custom selectors
-    selectors = content_selectors if content_selectors else default_selectors
+    # Try to find the main content
+    main_content = None
     
-    # Try each selector in order
-    for selector in selectors:
-        main_content = soup.select(selector)
-        if main_content:
-            # If multiple elements match, combine them
-            if len(main_content) > 1:
-                wrapper = soup.new_tag('div')
-                for element in main_content:
-                    wrapper.append(element)
-                return str(wrapper)
-            return str(main_content[0])
+    # Method 1: Look for common content containers
+    for selector in ['main', 'article', '.content', '.post', '.entry']:
+        content = soup.select_one(selector)
+        if content:
+            main_content = content
+            break
     
-    # Fallback to body if no selectors matched
-    body = soup.find('body')
-    if body:
-        # Clean the body
-        cleaned_body = clean_html(str(body))
-        return cleaned_body
+    # Method 2: Find the largest text block
+    if not main_content:
+        max_length = 0
+        candidates = soup.find_all(['div', 'section'])
+        
+        for candidate in candidates:
+            text_length = len(candidate.get_text(strip=True))
+            if text_length > max_length:
+                max_length = text_length
+                main_content = candidate
     
-    # Last resort: return the original HTML
-    return html
+    # Method 3: If all else fails, use the body
+    if not main_content:
+        main_content = soup.body or soup
+    
+    return str(main_content)
 
 
 def extract_title(html: str) -> str:
@@ -240,20 +239,20 @@ def extract_title(html: str) -> str:
     
     soup = BeautifulSoup(html, 'html.parser')
     
-    # Try to get title from article header first
-    for selector in ['.post-title', '.entry-title', '.article-title', 'h1.title', 'h1']:
-        title_elem = soup.select_one(selector)
-        if title_elem:
-            return title_elem.get_text(strip=True)
+    # Try the title tag first
+    title_tag = soup.title
+    if title_tag:
+        title = title_tag.string.strip()
+        # Clean up title (remove site name)
+        title = re.sub(r'\s*[|].*$', '', title)
+        return title
     
-    # Fall back to document title
-    if soup.title:
-        # Clean up title (remove site name, etc.)
-        title = soup.title.string
-        title = re.sub(r'\s*[|\-–—]\s*.*$', '', title)  # Remove text after separator
-        return title.strip()
+    # Try h1 tags
+    h1_tag = soup.find('h1')
+    if h1_tag:
+        return h1_tag.get_text(strip=True)
     
-    return "Untitled"
+    return ""
 
 
 def extract_author(html: str) -> Optional[str]:
@@ -313,6 +312,13 @@ def extract_date_published(html: str) -> Optional[str]:
     
     soup = BeautifulSoup(html, 'html.parser')
     
+    # Try time tag
+    time_tag = soup.find('time')
+    if time_tag:
+        if time_tag.has_attr('datetime'):
+            return time_tag['datetime']
+        return time_tag.get_text(strip=True)
+    
     # Try to find date in meta tags
     for meta in soup.find_all('meta'):
         property = meta.get('property', '')
@@ -324,11 +330,16 @@ def extract_date_published(html: str) -> Optional[str]:
     
     # Try common date selectors
     for selector in [
-        '.date', '.published', '.post-date', '.entry-date', 
-        '[itemprop="datePublished"]', '.meta-date', '.time'
+        '[itemprop="datePublished"]',
+        '.published',
+        '.post-date',
+        '.entry-date',
+        '.date'
     ]:
         date_elem = soup.select_one(selector)
         if date_elem:
+            if date_elem.has_attr('datetime'):
+                return date_elem['datetime']
             return date_elem.get_text(strip=True)
     
     # Try structured data
@@ -341,6 +352,11 @@ def extract_date_published(html: str) -> Optional[str]:
                     return date
         except (json.JSONDecodeError, AttributeError):
             continue
+    
+    # Try meta tags
+    meta_date = soup.find('meta', {'property': 'article:published_time'})
+    if meta_date and meta_date.get('content'):
+        return meta_date['content']
     
     return None
 

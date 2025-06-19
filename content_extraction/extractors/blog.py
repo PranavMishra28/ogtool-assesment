@@ -8,18 +8,16 @@ import re
 import time
 import random
 import logging
+import uuid
 from typing import Dict, List, Any, Optional
+from urllib.parse import urlparse, urljoin
 
 import requests
 from bs4 import BeautifulSoup
+import html2text
 from tqdm import tqdm
 
 from content_extraction.base import ContentExtractor, ContentItem
-from content_extraction.utils import (
-    fetch_url, extract_links_from_page, extract_main_content,
-    extract_title, extract_author, extract_date_published,
-    html_to_markdown_text, generate_unique_id
-)
 
 
 class GenericBlogExtractor(ContentExtractor):
@@ -36,12 +34,24 @@ class GenericBlogExtractor(ContentExtractor):
         self.article_selectors = config.get("extractors", {}).get("generic_blog", {}).get(
             "article_selectors", ["article", ".post", ".entry", ".blog-post"]
         )
-        self.link_patterns = config.get("extractors", {}).get("generic_blog", {}).get(
-            "list_page_link_patterns", ["/(article|post|blog)/", "/\\d{4}/\\d{2}/"]
-        )
-        self.delay_range = config.get("sources", {}).get("blog", {}).get(
+        self.delay_between_requests = config.get("sources", {}).get("blog", {}).get(
             "delay_between_requests", [1, 3]
         )
+        
+        # Set up HTML to markdown converter
+        self.markdown_converter = html2text.HTML2Text()
+        self.markdown_converter.ignore_links = False
+        self.markdown_converter.ignore_images = False
+        self.markdown_converter.ignore_emphasis = False
+        self.markdown_converter.ignore_tables = False
+        self.markdown_converter.body_width = 0  # No line wrapping
+        
+        # Define headers for requests
+        self.headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        }
     
     def can_handle(self, source: str) -> bool:
         """
@@ -56,7 +66,9 @@ class GenericBlogExtractor(ContentExtractor):
         return source.startswith(("http://", "https://")) and not any([
             "substack.com" in source.lower(),
             "drive.google.com" in source.lower(),
-            source.lower().endswith(".pdf")
+            "github.com" in source.lower(),
+            source.lower().endswith(".pdf"),
+            source.lower().endswith(".md")
         ])
     
     def extract(self, url: str) -> List[ContentItem]:
@@ -73,130 +85,186 @@ class GenericBlogExtractor(ContentExtractor):
         
         try:
             # Fetch the page content
-            html_content = fetch_url(url)
+            html_content = self._fetch_url(url)
             if not html_content:
                 self.logger.error(f"Failed to fetch URL: {url}")
                 return []
             
-            # Determine if it's a list page or an individual article
-            soup = BeautifulSoup(html_content, 'html.parser')
-            
-            # Heuristic to determine if it's a list page
-            article_count = len(soup.select(','.join(self.article_selectors)))
-            link_count = 0
-            
-            for pattern in self.link_patterns:
-                compiled_pattern = re.compile(pattern)
-                links = soup.find_all('a', href=compiled_pattern)
-                link_count += len(links)
-            
-            if article_count > 3 or link_count > 10:
-                # Process as a list page
-                extracted_items = self._process_list_page(url, html_content)
-                self.logger.info(f"Processed {len(extracted_items)} articles from list page")
-                return extracted_items
-            else:
-                # Process as an individual page
-                extracted_items = self._process_individual_page(url, html_content)
-                self.logger.info(f"Processed individual page with {len(extracted_items)} items")
-                return extracted_items
+            # Process the page
+            items = self._process_page(url, html_content)
+            self.logger.info(f"Extracted {len(items)} item(s) from {url}")
+            return items
                 
         except Exception as e:
             self.logger.error(f"Error processing generic blog {url}: {e}", exc_info=True)
             return []
     
-    def _process_list_page(self, url: str, html_content: str) -> List[ContentItem]:
-        """
-        Process a blog list page.
-        
-        Args:
-            url: List page URL
-            html_content: HTML content
-            
-        Returns:
-            List of ContentItem objects
-        """
-        # Extract links to individual articles
-        links = extract_links_from_page(html_content, url, self.link_patterns)
-        total_links = len(links)
-        self.logger.info(f"Found {total_links} articles on list page")
-        
-        extracted_items = []
-        
-        # Process each article link with progress indicator
-        for link in tqdm(links, desc="Processing articles", unit="article"):
-            try:
-                items = self._process_individual_page(link)
-                extracted_items.extend(items)
-                
-                # Add a small delay to avoid overloading the server
-                time.sleep(random.uniform(self.delay_range[0], self.delay_range[1]))
-            except Exception as e:
-                self.logger.error(f"Error processing article {link}: {e}")
-        
-        return extracted_items
-    
-    def _process_individual_page(self, url: str, html_content: Optional[str] = None) -> List[ContentItem]:
-        """
-        Process an individual blog page.
-        
-        Args:
-            url: URL of the page
-            html_content: HTML content if already fetched, otherwise None
-            
-        Returns:
-            List with a single ContentItem
-        """
+    def _fetch_url(self, url: str) -> Optional[str]:
+        """Fetch content from a URL with error handling."""
         try:
-            # Fetch content if not provided
-            if not html_content:
-                html_content = fetch_url(url)
-                if not html_content:
-                    self.logger.error(f"Failed to fetch URL: {url}")
-                    return []
+            response = requests.get(url, headers=self.headers, timeout=30)
+            response.raise_for_status()
+            return response.text
+        except Exception as e:
+            self.logger.error(f"Failed to fetch URL {url}: {e}", exc_info=True)
+            return None
+    
+    def _process_page(self, url: str, html_content: str) -> List[ContentItem]:
+        """Process a blog page and extract content."""
+        try:
+            # Parse HTML
+            soup = BeautifulSoup(html_content, 'html.parser')
             
-            # Extract article title
-            title = extract_title(html_content)
+            # Extract title
+            title = self._extract_title(soup)
             if not title:
-                self.logger.warning(f"Could not extract title from {url}")
                 title = "Untitled Article"
             
             # Extract main content
-            main_content_html = extract_main_content(html_content, self.article_selectors)
-            if not main_content_html or len(main_content_html) < 100:  # Sanity check
-                self.logger.warning(f"Extracted content from {url} is too short or empty")
-                # Try using body as fallback
-                soup = BeautifulSoup(html_content, 'html.parser')
-                body = soup.find('body')
-                if body:
-                    main_content_html = str(body)
-                else:
-                    self.logger.error(f"Could not extract meaningful content from {url}")
-                    return []
+            main_content_html = self._extract_main_content(soup)
             
             # Convert to markdown
-            markdown_content = html_to_markdown_text(main_content_html)
-            if not markdown_content or len(markdown_content) < 100:
-                self.logger.error(f"Markdown conversion failed or content too short for {url}")
-                return []
+            markdown_content = self._html_to_markdown(main_content_html)
             
             # Extract metadata
-            author = extract_author(html_content)
-            date_published = extract_date_published(html_content)
+            author = self._extract_author(soup)
+            date_published = self._extract_date_published(soup)
+            
+            # Generate unique ID
+            content_id = str(uuid.uuid5(uuid.NAMESPACE_URL, url + title))
             
             # Create content item
             content_item = ContentItem(
-                content_id=generate_unique_id(),
+                content_id=content_id,
                 title=title,
                 content=markdown_content,
                 source_url=url,
                 content_type="article",
                 author=author,
-                date_published=date_published
+                date_published=date_published,
+                metadata={
+                    "extracted_from": "generic_blog",
+                    "extraction_timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                }
             )
             
             return [content_item]
             
         except Exception as e:
-            self.logger.error(f"Error processing page {url}: {e}", exc_info=True)
+            self.logger.error(f"Error processing blog page {url}: {e}", exc_info=True)
             return []
+    
+    def _extract_title(self, soup: BeautifulSoup) -> str:
+        """Extract title from a BeautifulSoup object."""
+        # Try the title tag first
+        title_tag = soup.title
+        if title_tag and title_tag.string:
+            title = title_tag.string.strip()
+            # Clean up title (remove site name, etc.)
+            title = re.sub(r'\s*[|–-].*$', '', title)
+            return title
+        
+        # Try h1 tags
+        h1_tag = soup.find('h1')
+        if h1_tag:
+            return h1_tag.get_text(strip=True)
+        
+        # Try article header
+        header = soup.find('header')
+        if header:
+            h_tag = header.find(['h1', 'h2'])
+            if h_tag:
+                return h_tag.get_text(strip=True)
+        
+        return ""
+    
+    def _extract_main_content(self, soup: BeautifulSoup) -> str:
+        """Extract the main content from a BeautifulSoup object."""
+        # Remove unwanted elements
+        for selector in ['script', 'style', 'nav', 'header', 'footer', '.ads', 
+                        '.sidebar', '.comments', '.navbar', '.menu', '.navigation']:
+            for element in soup.select(selector):
+                element.decompose()
+        
+        # Try to find the main content using common selectors
+        main_content = None
+        
+        # Try common content selectors
+        for selector in self.article_selectors + ['main', '.content', '.post-content', '.entry-content']:
+            content = soup.select_one(selector)
+            if content:
+                # Check if the content has enough text
+                text = content.get_text(strip=True)
+                if len(text) > 200:  # Reasonable minimum for an article
+                    main_content = content
+                    break
+        
+        # If no suitable content found, try to find the largest text block
+        if not main_content:
+            max_text_length = 0
+            for tag in soup.find_all(['div', 'section', 'article']):
+                text = tag.get_text(strip=True)
+                if len(text) > max_text_length:
+                    max_text_length = len(text)
+                    main_content = tag
+        
+        # If all else fails, use the body
+        if not main_content or len(main_content.get_text(strip=True)) < 200:
+            main_content = soup.body or soup
+        
+        return str(main_content)
+    
+    def _html_to_markdown(self, html_content: str) -> str:
+        """Convert HTML to markdown text."""
+        markdown_text = self.markdown_converter.handle(html_content)
+        
+        # Clean up the markdown
+        markdown_text = re.sub(r'\n{3,}', '\n\n', markdown_text)  # Replace excessive newlines
+        
+        return markdown_text
+    
+    def _extract_author(self, soup: BeautifulSoup) -> Optional[str]:
+        """Extract author information from a BeautifulSoup object."""
+        # Try common author selectors
+        for selector in [
+            '[rel="author"]', '.author', '.byline', '[itemprop="author"]', 
+            '.post-author', '.entry-author', '.author-name', '.writer'
+        ]:
+            author_elem = soup.select_one(selector)
+            if author_elem:
+                return author_elem.get_text(strip=True)
+        
+        # Try meta tags
+        meta_author = soup.find('meta', {'name': 'author'}) or soup.find('meta', {'property': 'author'})
+        if meta_author and meta_author.get('content'):
+            return meta_author['content']
+        
+        return None
+    
+    def _extract_date_published(self, soup: BeautifulSoup) -> Optional[str]:
+        """Extract publication date from a BeautifulSoup object."""
+        # Try time tag
+        time_tag = soup.find('time')
+        if time_tag:
+            if time_tag.has_attr('datetime'):
+                return time_tag['datetime']
+            return time_tag.get_text(strip=True)
+        
+        # Try common date selectors
+        for selector in [
+            '[itemprop="datePublished"]', '.published', '.post-date', 
+            '.entry-date', '.date', '.timestamp', '.post-timestamp'
+        ]:
+            date_elem = soup.select_one(selector)
+            if date_elem:
+                if date_elem.has_attr('datetime'):
+                    return date_elem['datetime']
+                return date_elem.get_text(strip=True)
+        
+        # Try meta tags
+        for prop in ['article:published_time', 'published_time', 'publication_date']:
+            meta_date = soup.find('meta', {'property': prop})
+            if meta_date and meta_date.get('content'):
+                return meta_date['content']
+        
+        return None
