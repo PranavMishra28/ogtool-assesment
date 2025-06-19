@@ -1,0 +1,290 @@
+2025-06-19 01:03:30,008 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,122 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,170 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,173 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,356 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,358 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,363 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,363 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,389 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,389 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,390 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,390 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,390 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,390 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,391 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,391 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,391 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,391 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,398 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,398 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,398 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,399 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,399 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,399 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,400 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,400 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,400 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,401 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,401 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,401 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,402 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,403 - ExtractorManager - INFO - Using GenericBlogExtractor for https://github.blog/
+2025-06-19 01:03:30,403 - ExtractorManager - INFO - Using GenericBlogExtractor for https://github.blog/
+2025-06-19 01:03:30,403 - ExtractorManager - INFO - Using GenericBlogExtractor for https://github.blog/
+2025-06-19 01:03:30,810 - ExtractorManager - INFO - Using GenericBlogExtractor for https://nonexistent-blog-xyz.com/
+2025-06-19 01:03:30,810 - ExtractorManager - INFO - Using GenericBlogExtractor for https://nonexistent-blog-xyz.com/
+2025-06-19 01:03:30,810 - ExtractorManager - INFO - Using GenericBlogExtractor for https://nonexistent-blog-xyz.com/
+2025-06-19 01:03:30,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:30,856 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,856 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,856 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,856 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:30,858 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,858 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,858 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,858 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:30,859 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,859 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,859 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,859 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:30,860 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,860 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,860 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,860 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:30,861 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/microsoft/vscode
+2025-06-19 01:03:30,861 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/microsoft/vscode
+2025-06-19 01:03:30,861 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/microsoft/vscode
+2025-06-19 01:03:30,861 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/microsoft/vscode
+2025-06-19 01:03:31,819 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/nonexistent/repo
+2025-06-19 01:03:31,819 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/nonexistent/repo
+2025-06-19 01:03:31,819 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/nonexistent/repo
+2025-06-19 01:03:31,819 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/nonexistent/repo
+2025-06-19 01:03:32,776 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,776 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,776 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,776 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,776 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,777 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,777 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,777 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,777 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,777 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,778 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,778 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,778 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,778 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,778 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,779 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,779 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,779 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,779 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,779 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,780 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,780 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,780 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,780 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,780 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,781 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,781 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,781 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,781 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,781 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,783 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmpwkvza0zq.md
+2025-06-19 01:03:32,783 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmpwkvza0zq.md
+2025-06-19 01:03:32,783 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmpwkvza0zq.md
+2025-06-19 01:03:32,783 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmpwkvza0zq.md
+2025-06-19 01:03:32,783 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmpwkvza0zq.md
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,801 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,802 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,804 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,805 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,807 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,808 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,810 - ExtractorManager - INFO - Using PDFExtractor for C:\Users\mishr\AppData\Local\Temp\tmppsjo9_dd.pdf
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,855 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,857 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,858 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,860 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,861 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,862 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:32,864 - ExtractorManager - INFO - Using GenericBlogExtractor for https://stratechery.com/
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,565 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,567 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,569 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,571 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,574 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,576 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:03:34,579 - ExtractorManager - INFO - Using MarkdownExtractor for C:\Users\mishr\AppData\Local\Temp\tmp0woxdi9a.md
+2025-06-19 01:04:16,747 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:04:16,805 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:04:16,829 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:04:16,833 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:04:16,994 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:04:16,996 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:09:45,634 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:09:45,648 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:09:45,649 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:09:45,735 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:09:45,737 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:21:15,548 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:21:15,563 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:21:15,564 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:21:15,651 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:21:15,652 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:25:19,227 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:25:19,241 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:25:19,243 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:25:19,339 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:25:19,339 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:57:40,031 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:57:40,050 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:57:40,052 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:57:40,150 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:57:40,151 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:57:46,787 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 01:57:46,800 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 01:57:46,802 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 01:57:46,890 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 01:57:46,891 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 01:58:13,111 - ExtractorManager - WARNING - No suitable extractor found for https://github.com/PranavMishra28
+2025-06-19 02:05:02,692 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/PranavMishra28/ogtool-assesment
+2025-06-19 02:05:03,854 - ExtractorManager - INFO - Saved 1 items to sample

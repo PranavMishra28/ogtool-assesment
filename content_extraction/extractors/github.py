@@ -43,8 +43,7 @@ class GitHubExtractor(ContentExtractor):
             source: URL to check
             
         Returns:
-            True if this is a GitHub repository URL, False otherwise
-        """
+            True if this is a GitHub repository URL, False otherwise        """
         parsed_url = urlparse(source)
         return (
             parsed_url.netloc in ("github.com", "www.github.com") and
@@ -68,6 +67,11 @@ class GitHubExtractor(ContentExtractor):
             path_parts = urlparse(url).path.strip("/").split("/")
             if len(path_parts) < 2:
                 self.logger.error(f"Invalid GitHub URL format: {url}")
+                self.logger.error("GitHub URL should be in format: https://github.com/username/repository")
+                if len(path_parts) == 1:
+                    self.logger.info(f"Detected user profile URL. You may want to specify a specific repository.")
+                    # Try to suggest repositories for this user
+                    self._suggest_repositories(path_parts[0])
                 return []
             
             owner = path_parts[0]
@@ -212,6 +216,36 @@ class GitHubExtractor(ContentExtractor):
                 continue
         
         return items
+    
+    def _suggest_repositories(self, username: str):
+        """Suggest repositories for a given username."""
+        try:
+            api_url = f"https://api.github.com/users/{username}/repos"
+            headers = {
+                "Accept": "application/vnd.github.v3+json",
+                "User-Agent": "Content-Extractor/1.0"
+            }
+            
+            if self.access_token:
+                headers["Authorization"] = f"token {self.access_token}"
+            
+            response = requests.get(api_url, headers=headers, timeout=30)
+            
+            if response.status_code == 200:
+                repos = response.json()
+                if repos:
+                    self.logger.info(f"Found {len(repos)} repositories for user '{username}':")
+                    for i, repo in enumerate(repos[:5]):  # Show first 5 repos
+                        self.logger.info(f"  - {repo['html_url']} ({repo['description'] or 'No description'})")
+                    if len(repos) > 5:
+                        self.logger.info(f"  ... and {len(repos) - 5} more repositories")
+                else:
+                    self.logger.info(f"No public repositories found for user '{username}'")
+            else:
+                self.logger.warning(f"Could not fetch repositories for user '{username}' (status: {response.status_code})")
+                
+        except Exception as e:
+            self.logger.error(f"Error fetching repositories for user '{username}': {e}")
     
     def _extract_title_from_content(self, content: str) -> Optional[str]:
         """Extract title from markdown content."""

@@ -70,8 +70,7 @@ class PDFExtractor(ContentExtractor):
                 return []
         else:
             pdf_path = source
-        
-        # Verify PDF exists
+          # Verify PDF exists
         if not os.path.exists(pdf_path):
             self.logger.error(f"PDF file not found: {pdf_path}")
             return []
@@ -95,21 +94,56 @@ class PDFExtractor(ContentExtractor):
         self.logger.info(f"Downloading PDF from Google Drive: {url}")
         
         try:
+            # Validate and convert Google Drive URL if needed
+            file_id = self._extract_google_drive_file_id(url)
+            if not file_id:
+                self.logger.error("Could not extract file ID from Google Drive URL")
+                self.logger.error("Please ensure the URL is in one of these formats:")
+                self.logger.error("- https://drive.google.com/file/d/FILE_ID/view")
+                self.logger.error("- https://drive.google.com/open?id=FILE_ID")
+                return None
+            
             # Create a temporary file
             temp_dir = tempfile.gettempdir()
             output_path = os.path.join(temp_dir, f"gdrive_pdf_{uuid.uuid4().hex[:8]}.pdf")
             
-            # Use gdown to download the file
-            gdown.download(url, output_path, quiet=False)
+            # Try different download methods
+            success = False
             
-            # Verify the file was downloaded and is a PDF
-            if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
+            # Method 1: Use gdown with file ID
+            try:
+                self.logger.info(f"Attempting to download file ID: {file_id}")
+                gdown.download(id=file_id, output=output_path, quiet=False)
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    success = True
+            except Exception as e:
+                self.logger.warning(f"gdown with file ID failed: {e}")
+            
+            # Method 2: Try with the original URL but with fuzzy matching
+            if not success:
+                try:
+                    self.logger.info("Trying gdown with fuzzy matching...")
+                    gdown.download(url, output_path, quiet=False, fuzzy=True)
+                    if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                        success = True
+                except Exception as e:
+                    self.logger.warning(f"gdown with fuzzy matching failed: {e}")
+            
+            if not success:
                 self.logger.error("Failed to download file from Google Drive")
+                self.logger.error("Please make sure:")
+                self.logger.error("1. The file is shared publicly or with 'Anyone with the link'")
+                self.logger.error("2. The link is a direct file link (not a folder or drive home)")
+                self.logger.error("3. The file is actually a PDF")
                 return None
                 
             # Check if the file is actually a PDF
             if not self._is_valid_pdf(output_path):
                 self.logger.error("Downloaded file is not a valid PDF")
+                self.logger.error("The file might be:")
+                self.logger.error("- Not actually a PDF file")
+                self.logger.error("- A Google Drive HTML page (wrong sharing settings)")
+                self.logger.error("- Corrupted during download")
                 os.remove(output_path)  # Clean up the invalid file
                 return None
                 
@@ -119,6 +153,26 @@ class PDFExtractor(ContentExtractor):
         except Exception as e:
             self.logger.error(f"Error downloading from Google Drive: {e}", exc_info=True)
             return None
+    
+    def _extract_google_drive_file_id(self, url: str) -> Optional[str]:
+        """Extract file ID from various Google Drive URL formats."""
+        import re
+        
+        # Pattern 1: https://drive.google.com/file/d/FILE_ID/view
+        match = re.search(r'/file/d/([a-zA-Z0-9_-]+)', url)
+        if match:
+            return match.group(1)
+        
+        # Pattern 2: https://drive.google.com/open?id=FILE_ID
+        match = re.search(r'[?&]id=([a-zA-Z0-9_-]+)', url)
+        if match:
+            return match.group(1)
+          # Pattern 3: https://docs.google.com/document/d/FILE_ID/
+        match = re.search(r'/document/d/([a-zA-Z0-9_-]+)', url)
+        if match:
+            return match.group(1)
+        
+        return None
     
     def _is_valid_pdf(self, filepath: str) -> bool:
         """
