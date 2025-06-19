@@ -136,15 +136,30 @@ class PDFExtractor(ContentExtractor):
                 self.logger.error("2. The link is a direct file link (not a folder or drive home)")
                 self.logger.error("3. The file is actually a PDF")
                 return None
-                
-            # Check if the file is actually a PDF
+                  # Check if the file is actually a PDF
             if not self._is_valid_pdf(output_path):
-                self.logger.error("Downloaded file is not a valid PDF")
+                file_size = os.path.getsize(output_path) if os.path.exists(output_path) else 0
+                self.logger.error(f"Downloaded file is not a valid PDF (size: {file_size} bytes)")
+                
+                # Try to read the first few bytes to see what we got
+                try:
+                    with open(output_path, 'rb') as f:
+                        first_bytes = f.read(100)
+                        if b'<html' in first_bytes.lower() or b'<!doctype' in first_bytes.lower():
+                            self.logger.error("Downloaded file appears to be HTML (likely a Google Drive access page)")
+                            self.logger.error("Make sure the file is shared with 'Anyone with the link' can view")
+                        else:
+                            self.logger.error(f"Downloaded file starts with: {first_bytes[:50]}")
+                except:
+                    pass
+                    
                 self.logger.error("The file might be:")
                 self.logger.error("- Not actually a PDF file")
                 self.logger.error("- A Google Drive HTML page (wrong sharing settings)")
                 self.logger.error("- Corrupted during download")
-                os.remove(output_path)  # Clean up the invalid file
+                
+                if os.path.exists(output_path):
+                    os.remove(output_path)  # Clean up the invalid file
                 return None
                 
             self.logger.info(f"Successfully downloaded PDF to {output_path}")
@@ -166,8 +181,7 @@ class PDFExtractor(ContentExtractor):
         # Pattern 2: https://drive.google.com/open?id=FILE_ID
         match = re.search(r'[?&]id=([a-zA-Z0-9_-]+)', url)
         if match:
-            return match.group(1)
-          # Pattern 3: https://docs.google.com/document/d/FILE_ID/
+            return match.group(1)        # Pattern 3: https://docs.google.com/document/d/FILE_ID/
         match = re.search(r'/document/d/([a-zA-Z0-9_-]+)', url)
         if match:
             return match.group(1)
@@ -185,10 +199,36 @@ class PDFExtractor(ContentExtractor):
             True if the file is a valid PDF, False otherwise
         """
         try:
+            # Check if file exists and has reasonable size
+            if not os.path.exists(filepath):
+                return False
+                
+            file_size = os.path.getsize(filepath)
+            if file_size < 100:  # Too small to be a real PDF
+                return False
+            
+            # Check PDF magic number
             with open(filepath, 'rb') as f:
-                PyPDF2.PdfReader(f)
-            return True
-        except:
+                header = f.read(8)
+                if not header.startswith(b'%PDF-'):
+                    return False
+                
+                # Try to create a PdfReader to validate structure
+                f.seek(0)
+                try:
+                    reader = PyPDF2.PdfReader(f)
+                    # Try to access at least one page to ensure it's readable
+                    if len(reader.pages) > 0:
+                        return True
+                    return False
+                except Exception as e:
+                    self.logger.warning(f"PyPDF2 validation failed: {e}, but file has PDF header")
+                    # If PyPDF2 fails but we have PDF header, it might still be a valid PDF
+                    # that other tools can read
+                    return True
+                    
+        except Exception as e:
+            self.logger.error(f"Error validating PDF {filepath}: {e}")
             return False
     
     def _extract_from_pdf(self, pdf_path: str, source_url: Optional[str] = None) -> List[ContentItem]:

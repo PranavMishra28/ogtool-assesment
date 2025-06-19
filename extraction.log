@@ -288,3 +288,10 @@
 2025-06-19 01:58:13,111 - ExtractorManager - WARNING - No suitable extractor found for https://github.com/PranavMishra28
 2025-06-19 02:05:02,692 - ExtractorManager - INFO - Using GitHubExtractor for https://github.com/PranavMishra28/ogtool-assesment
 2025-06-19 02:05:03,854 - ExtractorManager - INFO - Saved 1 items to sample
+2025-06-19 02:05:47,934 - ExtractorManager - INFO - Registered extractor: GenericBlogExtractor
+2025-06-19 02:05:47,975 - ExtractorManager - INFO - Registered extractor: GitHubExtractor
+2025-06-19 02:05:47,978 - ExtractorManager - INFO - Registered extractor: MarkdownExtractor
+2025-06-19 02:05:48,071 - ExtractorManager - INFO - Registered extractor: PDFExtractor
+2025-06-19 02:05:48,072 - ExtractorManager - INFO - Registered extractor: SubstackExtractor
+2025-06-19 02:06:35,132 - ExtractorManager - INFO - Using PDFExtractor for https://drive.google.com/file/d/1mqBGdRrUyIISy4HWprT21GUQ-4U7-9Ap/view?usp=sharing
+2025-06-19 02:06:53,209 - ExtractorManager - INFO - Using PDFExtractor for https://drive.google.com/drive/home?dmr=1&ec=wgc-drive-hero-goto
